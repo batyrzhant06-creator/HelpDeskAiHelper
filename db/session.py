@@ -6,7 +6,7 @@ engine = create_engine(
     settings.DATABASE_URL,
     echo=False,            # можно True для логов SQL
 )
-# батыр
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
