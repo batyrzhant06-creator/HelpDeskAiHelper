@@ -1,12 +1,10 @@
-# app/models/ticket.py
 import uuid
 from datetime import datetime
+import enum
 
-from sqlalchemy import Column, String, DateTime, Enum, Float, Boolean
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy import Column, String, DateTime, Enum, Float, Boolean, Text
 
 from app.db.base import Base
-import enum
 
 
 def gen_uuid():
@@ -31,19 +29,22 @@ class TicketPriority(str, enum.Enum):
 class Ticket(Base):
     __tablename__ = "tickets"
 
-    id = Column(String, primary_key=True, default=gen_uuid, index=True)
+    # UUID как строка – 36 символов
+    id = Column(String(36), primary_key=True, default=gen_uuid, index=True)
 
-    source = Column(String, nullable=False)  # email|chat|portal|phone
-    subject = Column(String, nullable=False)
-    body = Column(String, nullable=False)
+    # Короткие строки → VARCHAR с длиной
+    source = Column(String(50), nullable=False)          # email|chat|portal|phone
+    subject = Column(String(255), nullable=False)
 
-    language = Column(String, nullable=True)  # ru|kk|en|auto
+    # Длинный текст → Text (в MySQL это TEXT)
+    body = Column(Text, nullable=False)
 
-    # Классификация
-    category = Column(String, nullable=True)        # network|access|hardware|software|other
-    priority = Column(Enum(TicketPriority), nullable=True)
-    incident_type = Column(String, nullable=True)   # incident|request|question|bug
-    department = Column(String, nullable=True)
+    language = Column(String(10), nullable=True)         # ru|kk|en|auto
+
+    category = Column(String(50), nullable=True)
+    incident_type = Column(String(50), nullable=True)
+    department = Column(String(100), nullable=True)
+
     classification_confidence = Column(Float, nullable=True)
 
     status = Column(Enum(TicketStatus), default=TicketStatus.new, nullable=False)
